@@ -7,10 +7,10 @@ jobs:
   build:
 
     # Specify the Xcode version to use
-    macos:
-      xcode: "10.0.1"
-
-    steps:
-      - checkout
-
-      - run: swift build
+    linux_swift_4.1:
+      docker:
+        - image: norionomura/swift:41
+      steps:
+        - checkout
+        - run: swift build
+        - run: swift test
