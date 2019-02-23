@@ -3,7 +3,7 @@ import XCTest
 #if !os(macOS)
 public func allTests() -> [XCTestCaseEntry] {
     return [
-        testCase(ConfluencePageGeneratorTests.allTests),
+        testCase(CoupageTests.allTests),
     ]
 }
 #endif
