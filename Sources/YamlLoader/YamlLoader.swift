@@ -11,8 +11,28 @@ import Yams
 struct YamlLoader {
     private init() {}
     
-    private static func fetchConfigFile() -> String {
+    /// configファイルをYAML形式でパースします
+    ///
+    /// - Returns: configから読み込んだUser設定
+    static func loadConfig() -> UserConfig {
+        guard let config = try? Yams.compose(yaml: fetchConfigFile()),
+            let confluence = config?["config"]?["confluence"],
+            let name = confluence["user_id"]?.string,
+            !name.isEmpty,
+            let password = confluence["password"]?.string,
+            !password.isEmpty,
+            let urlString = confluence["url"]?.string,
+            let url = URL(string: urlString) else {
+                fatalError("⛔️ couldn't load config")
+        }
         
+        return UserConfig(name: name, password: password, url: url)
+    }
+    
+    /// configファイルを取得します
+    ///
+    /// - Returns: configファイルの中身
+    private static func fetchConfigFile() -> String {
         let configPath = FileManager.default.currentDirectoryPath + "/config.yml"
         
         if !FileManager.default.fileExists(atPath: configPath) {
@@ -24,15 +44,5 @@ struct YamlLoader {
         }
         
         return contents
-    }
-    
-    static func loadConfig() -> UserConfig {
-        guard let config = try? Yams.compose(yaml: fetchConfigFile()),
-              let confluence = config?["config"]?["confluence"],
-              let userConfig = UserConfig(name: confluence["user_id"]?.string, password: confluence["password"]?.string, urlString: confluence["url"]?.string) else {
-            fatalError("⛔️ couldn't load config")
-        }
-        
-        return userConfig
     }
 }
