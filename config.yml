@@ -1,0 +1,5 @@
+config:
+  confluence:
+    user_id: "user_id"
+    password: "password"
+    url: "url"
