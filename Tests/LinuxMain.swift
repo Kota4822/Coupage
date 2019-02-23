@@ -1,7 +1,7 @@
 import XCTest
 
-import ConfluencePageGeneratorTests
+import CoupageTests
 
 var tests = [XCTestCaseEntry]()
-tests += ConfluencePageGeneratorTests.allTests()
+tests += CoupageTests.allTests()
 XCTMain(tests)
