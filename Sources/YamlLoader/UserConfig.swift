@@ -8,14 +8,23 @@
 import Foundation
 
 public struct UserConfig {
-    let name: String
-    let password: String
-    let url: URL
+    public static var shared: UserConfig = YamlLoader.loadConfig()
+    public let name: String
+    public let password: String
+    public let url: URL
+    private init(name: String, password: String, url: URL) {
+        self.name = name
+        self.password = password
+        self.url = url
+    }
 }
 
 extension UserConfig {
-    init?(name: String, password: String, urlString: String) {
-        guard let url = URL(string: urlString) else { return nil }
+    init?(name: String? = nil, password: String? = nil, urlString: String? = nil) {
+        guard let name = name, !name.isEmpty, let password = password, !password.isEmpty, let urlString = urlString, let url = URL(string: urlString) else {
+            return nil
+        }
+        
         self.init(name: name, password: password, url: url)
     }
 }
