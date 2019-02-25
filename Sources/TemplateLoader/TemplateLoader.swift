@@ -1,7 +1,7 @@
 import Foundation
 
-struct TemplateFileAccessor {
-    static func fetchTemplate() -> String {
+public struct TemplateFileAccessor {
+    public static func fetchTemplate() -> String {
 
         // TODO: templeteのfilename/pathを決める
         let dir = FileManager.default.currentDirectoryPath + "./ReleaseNoteTemplate"

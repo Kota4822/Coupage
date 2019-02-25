@@ -20,13 +20,7 @@ func run() {
     // TODO: 外部から引数で受け取る
     // 生成するpegeのtitle
     let pageTitle = "pageTitle"
-    
-    let pageValueString = TemplateFileAccessor.fetchTemplate()
-    
-    ConfluenceAPI().generateReleaseNote(spaceKey: spaceKey,
-                                        ancestorsKey: ancestorsKey,
-                                        pageTitle: pageTitle,
-                                        pageValueString: pageValueString)
+
 }
 
 run()

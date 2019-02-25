@@ -2,7 +2,7 @@ import Foundation
 
 /// ConfluenceのREST APIで、新規ページを出力する
 /// https://developer.atlassian.com/server/confluence/confluence-rest-api-examples/
-struct ConfluenceAPI {
+public struct ConfluenceAPI {
     
     /// TODO: 外部設定から読み込みを行うようにする
     private let urlString = "https://confluence.XXXXXXX"
@@ -18,7 +18,7 @@ struct ConfluenceAPI {
     ///   - ancestorsKey: 追加対象の親ページキー
     ///   - pageTitle: ページのタイトル
     ///   - pageValueString: ページの内容
-    func generateReleaseNote(spaceKey: String, ancestorsKey: String?, pageTitle: String, pageValueString: String) {
+    public func generateReleaseNote(spaceKey: String, ancestorsKey: String?, pageTitle: String, pageValueString: String) {
         guard let url = URL(string: urlString) else {
             print("⛔️ URL生成失敗")
             assertionFailure()

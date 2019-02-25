@@ -8,6 +8,8 @@
 import Foundation
 import Yams
 
+import UserConfig
+
 struct YamlLoader {
     private init() {}
     
