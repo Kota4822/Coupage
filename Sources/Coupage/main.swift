@@ -1,4 +1,14 @@
+//
+//  main.swift
+//  Coupage
+//
+//  Created by Kota4822 on 2019/02/23.
+//
+
 import YamlLoader
+import ConfigLoader
+import TemplateLoader
+import UserConfig
 
 func run() {
     print("🍐 Start Generate Confluence Page")
@@ -20,7 +30,10 @@ func run() {
     // TODO: 外部から引数で受け取る
     // 生成するpegeのtitle
     let pageTitle = "pageTitle"
-
+    
+    let userConfig = UserConfigLoader.loadConfig()
+    
+    let template = TemplateLoader.fetchTemplate()
 }
 
 run()

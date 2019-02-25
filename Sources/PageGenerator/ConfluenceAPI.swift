@@ -1,3 +1,10 @@
+//
+//  ConfluenceAPI.swift
+//  Coupage
+//
+//  Created by Kota4822 on 2019/02/23.
+//
+
 import Foundation
 
 /// ConfluenceのREST APIで、新規ページを出力する

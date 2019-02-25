@@ -1,5 +1,5 @@
 //
-//  YamlLoader.swift
+//  UserConfigLoader.swift
 //  Coupage
 //
 //  Created by Takumi Karibe on 2019/02/23.
@@ -10,13 +10,13 @@ import Yams
 
 import UserConfig
 
-struct YamlLoader {
+public struct UserConfigLoader {
     private init() {}
     
     /// configファイルをYAML形式でパースします
     ///
     /// - Returns: configから読み込んだUser設定
-    static func loadConfig() -> UserConfig {
+    public static func loadConfig() -> UserConfig {
         guard let config = try? Yams.compose(yaml: fetchConfigFile()),
             let confluence = config?["config"]?["confluence"],
             let name = confluence["user_id"]?.string,

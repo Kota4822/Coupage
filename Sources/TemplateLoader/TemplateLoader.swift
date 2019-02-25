@@ -1,10 +1,19 @@
+//
+//  TemplateLoader.swift
+//  Coupage
+//
+//  Created by Takumi Karibe on 2019/02/23.
+//
+
 import Foundation
 
-public struct TemplateFileAccessor {
+public struct TemplateLoader {
+    private init() {}
+
     public static func fetchTemplate() -> String {
 
         // TODO: templeteのfilename/pathを決める
-        let dir = FileManager.default.currentDirectoryPath + "./ReleaseNoteTemplate"
+        let dir = FileManager.default.currentDirectoryPath + "/Template.tpl"
 
         if !FileManager.default.fileExists(atPath: dir) {
             fatalError("⛔️ Templateファイルが存在しません")
