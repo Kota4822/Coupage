@@ -1,3 +1,5 @@
+import YamlLoader
+
 func run() {
     print("🍐 Start Generate Confluence Page")
     
