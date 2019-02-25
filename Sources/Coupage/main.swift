@@ -5,9 +5,9 @@
 //  Created by Kota4822 on 2019/02/23.
 //
 
-import YamlLoader
 import ConfigLoader
 import TemplateLoader
+import PageGenerator
 import UserConfig
 
 func run() {
