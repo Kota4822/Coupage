@@ -9,12 +9,10 @@ import Foundation
 
 public struct TemplateLoader {
     private init() {}
-
+    
     public static func fetchTemplate() -> String {
-
-        // TODO: templeteのfilename/pathを決める
         let dir = FileManager.default.currentDirectoryPath + "/Template.tpl"
-
+        
         if !FileManager.default.fileExists(atPath: dir) {
             fatalError("⛔️ Templateファイルが存在しません")
         }
