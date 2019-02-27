@@ -13,12 +13,6 @@ import UserConfig
 func run() {
     print("🍐 Start Generate Confluence Page")
     
-    guard CommandLine.arguments.count >= 2 else {
-        print("⛔️ 引数が不足しています >>> \(CommandLine.arguments)")
-        assertionFailure()
-        return
-    }
-    
     // TODO: 外部から引数で受け取る
     // 対象のspacekey
     let spaceKey = "spaceKey"
