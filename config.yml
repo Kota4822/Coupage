@@ -1,5 +1,8 @@
 config:
-  confluence:
+  user:
     user_id: "user_id"
     password: "password"
+  confluence:
     url: "url"
+    default_space_key: "space_key"
+    default_ancestors_key: ""

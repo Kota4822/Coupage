@@ -14,19 +14,19 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "Coupage",
-            dependencies: ["ConfigLoader", "TemplateLoader", "PageGenerator", "UserConfig"]),
+            dependencies: ["PageGenerator"]),
         .target(
-            name: "UserConfig",
+            name: "Config",
             dependencies: []),
         .target(
             name: "ConfigLoader",
-            dependencies: ["Yams", "UserConfig"]),
+            dependencies: ["Yams", "Config"]),
         .target(
             name: "TemplateLoader",
             dependencies: []),
         .target(
             name: "PageGenerator",
-            dependencies: ["UserConfig"]),
+            dependencies: ["Config", "ConfigLoader", "TemplateLoader"]),
         .testTarget(
             name: "CoupageTests",
             dependencies: ["Coupage"]),

@@ -1,44 +1,36 @@
 //
-//  ConfluenceAPI.swift
+//  PageGenerator.swift
 //  Coupage
 //
 //  Created by Kota4822 on 2019/02/23.
 //
 
 import Foundation
+import ConfigLoader
+import Config
+import TemplateLoader
 
 /// ConfluenceのREST APIで、新規ページを出力する
 /// https://developer.atlassian.com/server/confluence/confluence-rest-api-examples/
-public struct ConfluenceAPI {
+public struct PageGenerator {
     
-    /// TODO: 外部設定から読み込みを行うようにする
-    private let urlString = "https://confluence.XXXXXXX"
+    private init() {}
     
-    /// TODO: 外部設定から読み込みを行うようにする
-    private let username = "username"
-    private let password = "password"
-
-    /// Confluenceに新規にリリースノートページを追加します
+    /// Confluenceに新規にページを追加します
     ///
     /// - Parameters:
     ///   - spaceKey: 追加対象のスペースキー
     ///   - ancestorsKey: 追加対象の親ページキー
     ///   - pageTitle: ページのタイトル
-    ///   - pageValueString: ページの内容
-    public func generateReleaseNote(spaceKey: String, ancestorsKey: String?, pageTitle: String, pageValueString: String) {
-        guard let url = URL(string: urlString) else {
-            print("⛔️ URL生成失敗")
-            assertionFailure()
-            return
-        }
+    public static func generate(pageTitle: String) {
+        let config = ConfigLoader.loadConfig()
+        let template = TemplateLoader.fetchTemplate()
         
-        var headerFields: [String: String]? {
+        var headerFields: [String: String] {
             var headerFieldsDic = [String: String]()
             headerFieldsDic["Content-Type"] = "application/json"
-            guard let credentialData = "\(username):\(password)".data(using: String.Encoding.utf8) else {
-                print("⛔️ 認証用データ生成失敗")
-                assertionFailure()
-                return nil
+            guard let credentialData = "\(config.user.name):\(config.user.password)".data(using: String.Encoding.utf8) else {
+                fatalError("⛔️ 認証用データ生成失敗")
             }
             let credential = credentialData.base64EncodedString(options: [])
             headerFieldsDic["Authorization"] = "Basic \(credential)"
@@ -49,23 +41,27 @@ public struct ConfluenceAPI {
             var jsonDic = [String: Any]()
             jsonDic["type"] = "page"
             jsonDic["title"] = pageTitle
-            jsonDic["space"] = ["key": spaceKey]
-            if let ancestorsKey = ancestorsKey {
+            jsonDic["space"] = ["key": config.confluence.spaceKey]
+            if let ancestorsKey = config.confluence.ancestorsKey {
                 jsonDic["ancestors"] = [["id": ancestorsKey]]
             }
-            // TODO: use template
-            jsonDic["body"] = ["storage": ["value": "<p>This is a new page</p>", "representation": "storage"]]
+            jsonDic["body"] = ["storage": ["value": template, "representation": "storage"]]
             return jsonDic
         }
         
+        request(url: config.confluence.url, header: headerFields, body: bodyJson)
+    }
+    
+    private static func request(url: URL, header: [String: String]?, body: [String: Any]) {
         let semaphore = DispatchSemaphore(value: 0)
         var request = URLRequest(url: url)
-        request.allHTTPHeaderFields = headerFields
+        request.allHTTPHeaderFields = header
         request.httpMethod = "POST"
-        request.httpBody = try? JSONSerialization.data(withJSONObject: bodyJson, options: [])
+        request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: [])
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             print("✅ \(String(describing: response))")
+//            if let statusCode = (response as? HTTPURLResponse)?.statusCode, !200...203.contains(statusCode)
             if let error = error {
                 print("⛔️ \(error)")
             }
