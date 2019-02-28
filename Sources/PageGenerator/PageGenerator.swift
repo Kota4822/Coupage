@@ -51,25 +51,39 @@ public struct PageGenerator {
         
         request(url: config.confluence.url, header: headerFields, body: bodyJson)
     }
+
     
+    /// 有効StatusCode
+    private static let validStatusCodeRange = 200...203
+
     private static func request(url: URL, header: [String: String]?, body: [String: Any]) {
+
         let semaphore = DispatchSemaphore(value: 0)
         var request = URLRequest(url: url)
+        
         request.allHTTPHeaderFields = header
         request.httpMethod = "POST"
         request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: [])
         
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
-            print("✅ \(String(describing: response))")
-//            if let statusCode = (response as? HTTPURLResponse)?.statusCode, !200...203.contains(statusCode)
-            if let error = error {
-                print("⛔️ \(error)")
+            
+            guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
+                print("⛔️ not found status code")
+                semaphore.signal()
+                return
             }
-            semaphore.signal()
+
+            if validStatusCodeRange.contains(statusCode) {
+                print("✅ \(String(describing: response))")
+            } else {
+                print("🚫 statusCode: \(statusCode)")
+                if let error = error {
+                    print("🚨 error: \(error)")
+                }
+            }
         }
         
         task.resume()
         semaphore.wait()
-        print("🍻 Completion!!!")
     }
 }
