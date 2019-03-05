@@ -17,15 +17,12 @@ public struct PageGenerator {
     private init() {}
     
     /// Confluenceに新規にページを追加します
-    ///
-    /// - Parameters:
-    ///   - pageTitle: ページのタイトル
-    ///   - spaceKey: 追加対象のスペースキー
-    ///   - ancestorsKey: 追加対象の親ページキー
-    public static func generate(pageTitle: String, spaceKey: String? = nil, ancestorsKey: String? = nil) {
-       
+    public static func generate(pageTitle: String) {
         let config = ConfigLoader.loadConfig()
         let template = TemplateLoader.fetchTemplate()
+        let argv = ProcessInfo.processInfo.arguments
+        let spaceKey = argv[safe: 1]
+        let ancestorsKey = argv[safe: 2]
         
         var headerFields: [String: String] {
             var headerFieldsDic = [String: String]()
@@ -42,7 +39,7 @@ public struct PageGenerator {
             var jsonDic = [String: Any]()
             jsonDic["type"] = "page"
             jsonDic["title"] = pageTitle
-            jsonDic["space"] = spaceKey ?? ["key": config.confluence.spaceKey]
+            jsonDic["space"] = ["key": spaceKey ?? config.confluence.spaceKey]
             if let ancestorsKey = ancestorsKey ?? config.confluence.ancestorsKey {
                 jsonDic["ancestors"] = [["id": ancestorsKey]]
             }
@@ -91,5 +88,15 @@ private extension PageGenerator {
         
         task.resume()
         semaphore.wait()
+    }
+}
+
+extension Array {
+    subscript(safe index: Int?) -> Element? {
+        guard let index = index, 0..<self.count ~= index else {
+            return nil
+        }
+        
+        return self[index]
     }
 }
