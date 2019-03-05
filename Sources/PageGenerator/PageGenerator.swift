@@ -49,13 +49,18 @@ public struct PageGenerator {
         
         request(url: config.confluence.url, header: headerFields, body: bodyJson)
     }
-    
+}
+
+private extension PageGenerator {
     
     /// 有効StatusCode
-    private static let validStatusCodeRange = 200...203
+    static var validStatusCodeRange: ClosedRange<Int> {
+        return 200...203
+    }
     
-    private static func request(url: URL, header: [String: String]?, body: [String: Any]) {
-        
+    /// Confluence REST API を利用してページ追加リクエストを行う
+    static func request(url: URL, header: [String: String]?, body: [String: Any]) {
+
         let semaphore = DispatchSemaphore(value: 0)
         var request = URLRequest(url: url)
         
