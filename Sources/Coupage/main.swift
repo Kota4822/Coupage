@@ -6,9 +6,9 @@
 //
 
 import PageGenerator
+
 print("📚 Release Confluence Page")
 
-// TODO: 引数でpageTitleや親pageを受け取れるようにする
 PageGenerator.generate(pageTitle: "testPage")
 
 print("🍻 Completion!!!")
