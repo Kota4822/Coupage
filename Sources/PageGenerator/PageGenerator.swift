@@ -19,10 +19,11 @@ public struct PageGenerator {
     /// Confluenceに新規にページを追加します
     ///
     /// - Parameters:
+    ///   - pageTitle: ページのタイトル
     ///   - spaceKey: 追加対象のスペースキー
     ///   - ancestorsKey: 追加対象の親ページキー
-    ///   - pageTitle: ページのタイトル
-    public static func generate(pageTitle: String) {
+    public static func generate(pageTitle: String, spaceKey: String? = nil, ancestorsKey: String? = nil) {
+       
         let config = ConfigLoader.loadConfig()
         let template = TemplateLoader.fetchTemplate()
         
@@ -41,8 +42,8 @@ public struct PageGenerator {
             var jsonDic = [String: Any]()
             jsonDic["type"] = "page"
             jsonDic["title"] = pageTitle
-            jsonDic["space"] = ["key": config.confluence.spaceKey]
-            if let ancestorsKey = config.confluence.ancestorsKey {
+            jsonDic["space"] = spaceKey ?? ["key": config.confluence.spaceKey]
+            if let ancestorsKey = ancestorsKey ?? config.confluence.ancestorsKey {
                 jsonDic["ancestors"] = [["id": ancestorsKey]]
             }
             jsonDic["body"] = ["storage": ["value": template, "representation": "storage"]]
@@ -51,12 +52,17 @@ public struct PageGenerator {
         
         request(url: config.confluence.url, header: headerFields, body: bodyJson)
     }
+}
 
+private extension PageGenerator {
     
     /// 有効StatusCode
-    private static let validStatusCodeRange = 200...203
-
-    private static func request(url: URL, header: [String: String]?, body: [String: Any]) {
+    static var validStatusCodeRange: ClosedRange<Int> {
+        return 200...203
+    }
+    
+    /// Confluence REST API を利用してページ追加リクエストを行う
+    static func request(url: URL, header: [String: String]?, body: [String: Any]) {
 
         let semaphore = DispatchSemaphore(value: 0)
         var request = URLRequest(url: url)
@@ -72,7 +78,7 @@ public struct PageGenerator {
                 semaphore.signal()
                 return
             }
-
+            
             if validStatusCodeRange.contains(statusCode) {
                 print("✅ \(String(describing: response))")
             } else {
