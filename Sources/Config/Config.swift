@@ -23,10 +23,10 @@ public struct Config {
         public let spaceKey: String
         public let ancestorsKey: String?
         
-        public init(url: URL, spaceKey: String, ancestorsKey: String) {
+        public init(url: URL, spaceKey: String, ancestorsKey: String?) {
             self.url = url
             self.spaceKey = spaceKey
-            self.ancestorsKey = ancestorsKey.isEmpty ? nil : ancestorsKey
+            self.ancestorsKey = ancestorsKey?.isEmpty == true ? nil : ancestorsKey
         }
     }
     

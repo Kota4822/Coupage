@@ -5,10 +5,19 @@
 //  Created by Kota4822 on 2019/02/23.
 //
 
-import PageGenerator
+import Foundation
+import CoupageCLI
+import Extension
 
 print("📚 Release Confluence Page")
 
-PageGenerator.generate(pageTitle: "testPage")
+func run() {
+    let argv = ProcessInfo.processInfo.arguments
+    let spaceKey = argv[safe: 1] ?? ""
+    let ancestorsKey = argv[safe: 2] ?? ""
+    CoupageCLI.execute(auguments: [spaceKey, ancestorsKey])
+}
+
+run()
 
 print("🍻 Completion!!!")

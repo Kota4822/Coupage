@@ -6,9 +6,7 @@
 //
 
 import Foundation
-import ConfigLoader
 import Config
-import TemplateLoader
 
 /// ConfluenceのREST APIで、新規ページを出力する
 /// https://developer.atlassian.com/server/confluence/confluence-rest-api-examples/
@@ -16,18 +14,12 @@ public struct PageGenerator {
     
     private init() {}
     
-    /// Confluenceに新規にページを追加します
-    public static func generate(pageTitle: String) {
-        let config = ConfigLoader.loadConfig()
-        let template = TemplateLoader.fetchTemplate()
-        let argv = ProcessInfo.processInfo.arguments
-        let spaceKey = argv[safe: 1]
-        let ancestorsKey = argv[safe: 2]
+    public static func generate(page: Page, user: Config.User) {
         
         var headerFields: [String: String] {
             var headerFieldsDic = [String: String]()
             headerFieldsDic["Content-Type"] = "application/json"
-            guard let credentialData = "\(config.user.name):\(config.user.password)".data(using: String.Encoding.utf8) else {
+            guard let credentialData = "\(user.name):\(user.password)".data(using: String.Encoding.utf8) else {
                 fatalError("⛔️ 認証用データ生成失敗")
             }
             let credential = credentialData.base64EncodedString(options: [])
@@ -38,16 +30,16 @@ public struct PageGenerator {
         var bodyJson: [String: Any] {
             var jsonDic = [String: Any]()
             jsonDic["type"] = "page"
-            jsonDic["title"] = pageTitle
-            jsonDic["space"] = ["key": spaceKey ?? config.confluence.spaceKey]
-            if let ancestorsKey = ancestorsKey ?? config.confluence.ancestorsKey {
+            jsonDic["title"] = page.title
+            jsonDic["space"] = ["key": page.config.spaceKey]
+            if let ancestorsKey = page.config.ancestorsKey {
                 jsonDic["ancestors"] = [["id": ancestorsKey]]
             }
-            jsonDic["body"] = ["storage": ["value": template, "representation": "storage"]]
+            jsonDic["body"] = ["storage": ["value": page.body, "representation": "storage"]]
             return jsonDic
         }
         
-        request(url: config.confluence.url, header: headerFields, body: bodyJson)
+        request(url: page.config.url, header: headerFields, body: bodyJson)
     }
 }
 
@@ -88,15 +80,5 @@ private extension PageGenerator {
         
         task.resume()
         semaphore.wait()
-    }
-}
-
-extension Array {
-    subscript(safe index: Int?) -> Element? {
-        guard let index = index, 0..<self.count ~= index else {
-            return nil
-        }
-        
-        return self[index]
     }
 }
