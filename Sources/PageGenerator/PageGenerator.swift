@@ -76,6 +76,7 @@ private extension PageGenerator {
                     print("🚨 error: \(error)")
                 }
             }
+            semaphore.signal()
         }
         
         task.resume()
