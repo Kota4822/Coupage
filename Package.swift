@@ -17,7 +17,7 @@ let package = Package(
             dependencies: ["CoupageCLI", "Extension"]),
         .target(
             name: "CoupageCLI",
-            dependencies: ["Config", "ConfigLoader", "TemplateLoader", "PageGenerator", "Extension"]),
+            dependencies: ["Config", "ConfigLoader", "TemplateLoader", "PageGenerator"]),
         .target(
             name: "Config",
             dependencies: []),

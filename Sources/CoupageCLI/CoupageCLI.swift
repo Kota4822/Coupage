@@ -10,14 +10,27 @@ import Config
 import ConfigLoader
 import TemplateLoader
 import PageGenerator
-import Extension
 
 public struct CoupageCLI {
-    
-    public static func execute(auguments: [String]? = nil) {
 
-        let spaceKey = auguments?[safe: 1]
-        let ancestorsKey = auguments?[safe: 2]
+    public struct Parameter {
+        let title: String
+        let spaceKey: String?
+        let ancestorsKey: String?
+        let templateAuguments: [String: String]
+        
+        public init(title: String, spaceKey: String?, ancestorsKey: String?, templateAuguments: [String: String]){
+            self.title = title
+            self.spaceKey = spaceKey
+            self.ancestorsKey = ancestorsKey
+            self.templateAuguments = templateAuguments
+        }
+    }
+    
+    public static func execute(_ parameter: Parameter) {
+
+        let spaceKey = parameter.spaceKey
+        let ancestorsKey = parameter.ancestorsKey
 
         let config = ConfigLoader.loadConfig()
         let template = TemplateLoader.fetchTemplate()
@@ -26,7 +39,12 @@ public struct CoupageCLI {
                                            spaceKey: spaceKey ?? config.confluence.spaceKey,
                                            ancestorsKey: ancestorsKey ?? config.confluence.ancestorsKey)
         
-        let page = Page(title: "aaa", body: template, config: confluence)
+        var replacedTemplate = template
+        parameter.templateAuguments.forEach { key, value in
+            replacedTemplate = replacedTemplate.replacingOccurrences(of: "{{\(key)}}", with: value)
+        }
+        
+        let page = Page(title: parameter.title, body: replacedTemplate, config: confluence)
         PageGenerator.generate(page: page, user: config.user)
     }
     
