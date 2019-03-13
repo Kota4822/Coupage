@@ -14,7 +14,10 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "Coupage",
-            dependencies: ["PageGenerator"]),
+            dependencies: ["CoupageCLI", "Extension"]),
+        .target(
+            name: "CoupageCLI",
+            dependencies: ["Config", "ConfigLoader", "TemplateLoader", "PageGenerator", "Extension"]),
         .target(
             name: "Config",
             dependencies: []),
@@ -27,6 +30,9 @@ let package = Package(
         .target(
             name: "PageGenerator",
             dependencies: ["Config", "ConfigLoader", "TemplateLoader"]),
+        .target(
+            name: "Extension",
+            dependencies: []),
         .testTarget(
             name: "CoupageTests",
             dependencies: ["Coupage"]),
