@@ -11,55 +11,77 @@ import Yams
 import Config
 
 public struct ConfigLoader {
+    
     private init() {}
     
     /// configファイルをYAML形式でパースします
     ///
     /// - Returns: configから読み込んだUser設定
     public static func loadConfig() -> Config {
-        
-        /// fetch config.yml
-        guard let config = try? Yams.compose(yaml: fetchConfigFile()) else {
-            fatalError("⛔️ couldn't load config")
-        }
-        
-        /// parse user config
-        guard let userConfig = config?["config"]?["user"],
-            let name = userConfig["user_id"]?.string,
-            !name.isEmpty,
-            let password = userConfig["password"]?.string,
-            !password.isEmpty else {
-                fatalError("⛔️ couldn't load config")
-        }
-        
-        /// parse confluence config
-        guard let confluenceConfig = config?["config"]?["confluence"],
-            let urlString = confluenceConfig["url"]?.string,
-            let url = URL(string: urlString),
-            let defaultSpaceKey = confluenceConfig["default_space_key"]?.string,
-            let defaultAncestorsKey = confluenceConfig["default_ancestors_key"]?.string else {
-                fatalError("⛔️ couldn't load config")
-        }
-        
-        let user = Config.User(name: name, password: password)
-        let confluence = Config.Confluence(url: url, spaceKey: defaultSpaceKey, ancestorsKey: defaultAncestorsKey)
-        return Config(user: user, confluence: confluence)
+        let user = fetchUserConfig()
+        let page = fetchPageConfig()
+        return Config(user: user, page: page)
+    }
+}
+
+private extension ConfigLoader {
+    
+    private static var userConfigFileName: String {
+        return "user_config.yml"
     }
     
-    /// configファイルを取得します
-    ///
-    /// - Returns: configファイルの中身
-    private static func fetchConfigFile() -> String {
-        let configPath = FileManager.default.currentDirectoryPath + "/config.yml"
+    private static var pageConfigFileName: String {
+        return "page_config.yml"
+    }
+
+    static func fetchUserConfig() -> Config.User {
+
+        let path = FileManager.default.currentDirectoryPath + "/" + userConfigFileName
+        let node = fetchConfigFile(at: path)
         
-        if !FileManager.default.fileExists(atPath: configPath) {
+        /// parse user config
+        guard let userConfig = node["user"],
+              let name = userConfig["user_id"]?.string,
+              !name.isEmpty,
+              let password = userConfig["password"]?.string,
+              !password.isEmpty else {
+                fatalError("⛔️ couldn't load user config")
+        }
+        
+        return Config.User(name: name, password: password)
+    }
+
+    static func fetchPageConfig() -> Config.Page {
+        
+        let path = FileManager.default.currentDirectoryPath + "/" + userConfigFileName
+        let node = fetchConfigFile(at: path)
+        
+        /// parse confluence config
+        guard let pageConfig = node["page"],
+            let urlString = pageConfig["url"]?.string,
+            let url = URL(string: urlString),
+            let defaultSpaceKey = pageConfig["default_space_key"]?.string,
+            let defaultAncestorsKey = pageConfig["default_ancestors_key"]?.string else {
+                fatalError("⛔️ couldn't load page config")
+        }
+        
+        return Config.Page(url: url, spaceKey: defaultSpaceKey, ancestorsKey: defaultAncestorsKey)
+    }
+    
+    static func fetchConfigFile(at filePath: String) -> Node {
+        if !FileManager.default.fileExists(atPath: filePath) {
             fatalError("⛔️ config is not exist")
         }
         
-        guard let configFile = FileManager.default.contents(atPath: configPath), let contents = String(data: configFile, encoding: .utf8) else {
+        guard let configFile = FileManager.default.contents(atPath: filePath), let contents = String(data: configFile, encoding: .utf8) else {
             fatalError("⛔️ config is invalid")
         }
         
-        return contents
+        guard let node = try? Yams.compose(yaml: contents), let result = node else {
+            fatalError("⛔️ couldn't load config")
+        }
+
+        return result
     }
+    
 }

@@ -18,7 +18,7 @@ public struct Config {
         }
     }
     
-    public struct Confluence {
+    public struct Page {
         public let url: URL
         public let spaceKey: String
         public let ancestorsKey: String?
@@ -31,10 +31,10 @@ public struct Config {
     }
     
     public let user: User
-    public let confluence: Confluence
+    public let page: Page
     
-    public init(user: User, confluence: Confluence) {
+    public init(user: User, page: Page) {
         self.user = user
-        self.confluence = confluence
+        self.page = page
     }
 }
