@@ -21,7 +21,14 @@ func run() {
     var reservedAuguments = [Reserved: String]()
     var templateAuguments = [String: String]()
 
-    ProcessInfo.processInfo.arguments.filter{ $0.contains(":") }
+    let args = ProcessInfo.processInfo.arguments
+    
+    if args[1] == "init" {
+        CoupageCLI.initialize()
+        return
+    }
+    
+    args.filter{ $0.contains(":") }
         .compactMap { $0.split(separator: ":").map(String.init) }
         .forEach { arg in
             if let reservedkey = Reserved(rawValue: arg[0]) {
