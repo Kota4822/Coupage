@@ -59,7 +59,7 @@ public struct CoupageCLI {
         let templateDirName = "\(configDirName)/templates"
         
         let sampleDirName = "\(templateDirName)/sample"
-        let sampleTmplFileName = "\(sampleDirName)/sample.tmpl"
+        let sampleTmplFileName = "\(sampleDirName)/sample.tpl"
         let sampleTmplContents = "<title>{{Title}}</title>".data(using: .utf8)
         let sampleYmlFileName = "\(sampleDirName)/page_config.yml"
         let sampleYmlContents = """
