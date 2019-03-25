@@ -35,10 +35,10 @@ public struct CoupageCLI {
         let config = ConfigLoader.loadConfig()
         let template = TemplateLoader.fetchTemplate()
 
-        let confluence = Config.Confluence(url: config.confluence.url,
-                                           spaceKey: spaceKey ?? config.confluence.spaceKey,
-                                           ancestorsKey: ancestorsKey ?? config.confluence.ancestorsKey)
-        
+        let confluence = Config.Page(url: config.page.url,
+                                     spaceKey: spaceKey ?? config.page.spaceKey,
+                                     ancestorsKey: ancestorsKey ?? config.page.ancestorsKey)
+
         var replacedTemplate = template
         parameter.templateAuguments.forEach { key, value in
             replacedTemplate = replacedTemplate.replacingOccurrences(of: "{{\(key)}}", with: value)
