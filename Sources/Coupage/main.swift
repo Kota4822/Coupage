@@ -15,7 +15,7 @@ func run() {
     print("📚 Release Confluence Page")
 
     enum Reserved: String, CaseIterable {
-        case pageTitle, spaceKey, ancestorsKey
+        case pageTitle, templateName, spaceKey, ancestorsKey
     }
     
     var reservedAuguments = [Reserved: String]()
@@ -38,11 +38,12 @@ func run() {
             }
     }
 
-    guard let pageTitle = reservedAuguments[.pageTitle] else {
-        fatalError("⛔️ pageTitleが存在しません")
+    guard let pageTitle = reservedAuguments[.pageTitle], let templateName = reservedAuguments[.templateName] else {
+        fatalError("⛔️ pageTitle/templateNameが存在しません")
     }
-    
-    let parameter = CoupageCLI.Parameter(title: pageTitle,
+
+    let parameter = CoupageCLI.Parameter(templateName: templateName,
+                                         title: pageTitle,
                                          spaceKey: reservedAuguments[.spaceKey],
                                          ancestorsKey: reservedAuguments[.ancestorsKey],
                                          templateAuguments: templateAuguments)

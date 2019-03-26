@@ -9,18 +9,28 @@ import Foundation
 
 public struct TemplateLoader {
     private init() {}
-    
-    public static func fetchTemplate() -> String {
-        let dir = FileManager.default.currentDirectoryPath + "/Template.tpl"
+
+    public static func fetchTemplate(templateName: String) -> String {
+        let path = templatePath(for: templateName)
         
-        if !FileManager.default.fileExists(atPath: dir) {
+        if !FileManager.default.fileExists(atPath: path) {
             fatalError("⛔️ Templateファイルが存在しません")
         }
         
-        guard let file = FileManager.default.contents(atPath: dir), let contents = String(data: file, encoding: .utf8) else {
+        guard let file = FileManager.default.contents(atPath: path), let contents = String(data: file, encoding: .utf8) else {
             fatalError("⛔️ Templateファイルが不正です")
         }
         
         return contents
+    }
+}
+
+private extension TemplateLoader {
+    static var rootPath: String {
+        return FileManager.default.currentDirectoryPath + "/.coupage"
+    }
+    
+    static func templatePath(for template: String) -> String {
+        return [rootPath, "templates", template, "\(template).tpl"].joined(separator: "/")
     }
 }

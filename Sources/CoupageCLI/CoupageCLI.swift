@@ -14,12 +14,14 @@ import PageGenerator
 public struct CoupageCLI {
 
     public struct Parameter {
+        let templateName: String
         let title: String
         let spaceKey: String?
         let ancestorsKey: String?
         let templateAuguments: [String: String]
         
-        public init(title: String, spaceKey: String?, ancestorsKey: String?, templateAuguments: [String: String]){
+        public init(templateName: String, title: String, spaceKey: String?, ancestorsKey: String?, templateAuguments: [String: String]){
+            self.templateName = templateName
             self.title = title
             self.spaceKey = spaceKey
             self.ancestorsKey = ancestorsKey
@@ -32,8 +34,8 @@ public struct CoupageCLI {
         let spaceKey = parameter.spaceKey
         let ancestorsKey = parameter.ancestorsKey
 
-        let config = ConfigLoader.loadConfig()
-        let template = TemplateLoader.fetchTemplate()
+        let config = ConfigLoader.loadConfig(templateName: parameter.templateName)
+        let template = TemplateLoader.fetchTemplate(templateName: parameter.templateName)
 
         let confluence = Config.Page(url: config.page.url,
                                      spaceKey: spaceKey ?? config.page.spaceKey,

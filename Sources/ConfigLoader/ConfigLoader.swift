@@ -17,33 +17,36 @@ public struct ConfigLoader {
     /// configファイルをYAML形式でパースします
     ///
     /// - Returns: configから読み込んだUser設定
-    public static func loadConfig() -> Config {
+    public static func loadConfig(templateName: String) -> Config {
         let user = fetchUserConfig()
-        let page = fetchPageConfig()
+        let page = fetchPageConfig(templateName: templateName)
         return Config(user: user, page: page)
     }
 }
 
 private extension ConfigLoader {
     
-    private static var userConfigFileName: String {
+    static var rootPath: String {
+        return FileManager.default.currentDirectoryPath + "/.coupage"
+    }
+
+    static var userConfigFileName: String {
         return "user_config.yml"
     }
     
-    private static var pageConfigFileName: String {
+    static var pageConfigFileName: String {
         return "page_config.yml"
     }
 
     static func fetchUserConfig() -> Config.User {
 
-        let path = FileManager.default.currentDirectoryPath + "/" + userConfigFileName
+        let path = [rootPath, userConfigFileName].joined(separator: "/")
         let node = fetchConfigFile(at: path)
-        
+
         /// parse user config
-        guard let userConfig = node["user"],
-              let name = userConfig["user_id"]?.string,
+        guard let name = node["id"]?.string,
               !name.isEmpty,
-              let password = userConfig["password"]?.string,
+              let password = node["password"]?.string,
               !password.isEmpty else {
                 fatalError("⛔️ couldn't load user config")
         }
@@ -51,17 +54,16 @@ private extension ConfigLoader {
         return Config.User(name: name, password: password)
     }
 
-    static func fetchPageConfig() -> Config.Page {
+    static func fetchPageConfig(templateName: String) -> Config.Page {
         
-        let path = FileManager.default.currentDirectoryPath + "/" + userConfigFileName
+        let path = [rootPath, "templates", templateName, pageConfigFileName].joined(separator: "/")
         let node = fetchConfigFile(at: path)
         
         /// parse confluence config
-        guard let pageConfig = node["page"],
-            let urlString = pageConfig["url"]?.string,
+        guard let urlString = node["url"]?.string,
             let url = URL(string: urlString),
-            let defaultSpaceKey = pageConfig["default_space_key"]?.string,
-            let defaultAncestorsKey = pageConfig["default_ancestors_key"]?.string else {
+            let defaultSpaceKey = node["default_space_key"]?.string,
+            let defaultAncestorsKey = node["default_ancestors_key"]?.string else {
                 fatalError("⛔️ couldn't load page config")
         }
         
@@ -83,5 +85,4 @@ private extension ConfigLoader {
 
         return result
     }
-    
 }
