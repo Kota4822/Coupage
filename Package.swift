@@ -5,6 +5,9 @@ import PackageDescription
 
 let package = Package(
     name: "Coupage",
+    products: [
+        .executable(name: "coupage", targets: ["Coupage"])
+        ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         .package(url: "https://github.com/jpsim/Yams.git", from: "1.0.1"),

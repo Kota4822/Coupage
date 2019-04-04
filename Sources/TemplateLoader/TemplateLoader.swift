@@ -31,6 +31,6 @@ private extension TemplateLoader {
     }
     
     static func templatePath(for template: String) -> String {
-        return [rootPath, "templates", template, "\(template).tpl"].joined(separator: "/")
+        return [rootPath, "templates", template, "template.tpl"].joined(separator: "/")
     }
 }

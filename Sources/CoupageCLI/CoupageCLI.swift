@@ -51,6 +51,8 @@ public struct CoupageCLI {
     }
     
     public static func initialize() {
+        print("💡 initializing...")
+
         let configDirName = ".coupage"
         let userConfigContents = """
                                 id:
@@ -61,7 +63,7 @@ public struct CoupageCLI {
         let templateDirName = "\(configDirName)/templates"
         
         let sampleDirName = "\(templateDirName)/sample"
-        let sampleTmplFileName = "\(sampleDirName)/sample.tpl"
+        let sampleTmplFileName = "\(sampleDirName)/template.tpl"
         let sampleTmplContents = "<title>{{Title}}</title>".data(using: .utf8)
         let sampleYmlFileName = "\(sampleDirName)/page_config.yml"
         let sampleYmlContents = """
@@ -80,7 +82,7 @@ public struct CoupageCLI {
             
             _ = FileManager.default.createFile(atPath: sampleTmplFileName, contents: sampleTmplContents, attributes: nil)
             _ = FileManager.default.createFile(atPath: sampleYmlFileName, contents: sampleYmlContents, attributes: nil)
-            
+            print("🍻 completed!!!")
         } catch {
             try? FileManager.default.removeItem(atPath: configDirName)
             try? FileManager.default.removeItem(atPath: userConfigFileName)
