@@ -12,23 +12,6 @@ import TemplateLoader
 import PageGenerator
 
 public struct CoupageCLI {
-
-    public struct Parameter {
-        let templateName: String
-        let title: String
-        let spaceKey: String?
-        let ancestorsKey: String?
-        let templateAuguments: [String: String]
-        
-        public init(templateName: String, title: String, spaceKey: String?, ancestorsKey: String?, templateAuguments: [String: String]){
-            self.templateName = templateName
-            self.title = title
-            self.spaceKey = spaceKey
-            self.ancestorsKey = ancestorsKey
-            self.templateAuguments = templateAuguments
-        }
-    }
-    
     public static func execute(_ parameter: Parameter) {
 
         let spaceKey = parameter.spaceKey
