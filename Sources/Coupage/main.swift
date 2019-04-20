@@ -10,6 +10,7 @@ import Commander
 import CoupageCLI
 import Extension
 
+extension Array: ArgumentConvertible where Element: ArgumentConvertible {}
 
 func run() {
     print("📚 Release Confluence Page")
