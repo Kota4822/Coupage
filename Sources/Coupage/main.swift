@@ -23,6 +23,4 @@ Group {
         CoupageCLI.run(args)
         print("🍻 Completion!!!")
     }
-    }.run()
-
-
+}.run()
