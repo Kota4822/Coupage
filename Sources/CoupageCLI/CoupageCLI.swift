@@ -12,47 +12,11 @@ import TemplateLoader
 import PageGenerator
 
 public struct CoupageCLI {
-
-    public struct Parameter {
-        let templateName: String
-        let title: String
-        let spaceKey: String?
-        let ancestorsKey: String?
-        let templateAuguments: [String: String]
-        
-        public init(templateName: String, title: String, spaceKey: String?, ancestorsKey: String?, templateAuguments: [String: String]){
-            self.templateName = templateName
-            self.title = title
-            self.spaceKey = spaceKey
-            self.ancestorsKey = ancestorsKey
-            self.templateAuguments = templateAuguments
-        }
-    }
-    
-    public static func execute(_ parameter: Parameter) {
-
-        let spaceKey = parameter.spaceKey
-        let ancestorsKey = parameter.ancestorsKey
-
-        let config = ConfigLoader.loadConfig(templateName: parameter.templateName)
-        let template = TemplateLoader.fetchTemplate(templateName: parameter.templateName)
-
-        let confluence = Config.Page(url: config.page.url,
-                                     spaceKey: spaceKey ?? config.page.spaceKey,
-                                     ancestorsKey: ancestorsKey ?? config.page.ancestorsKey)
-
-        var replacedTemplate = template
-        parameter.templateAuguments.forEach { key, value in
-            replacedTemplate = replacedTemplate.replacingOccurrences(of: "{{\(key)}}", with: value)
-        }
-        
-        let page = Page(title: parameter.title, body: replacedTemplate, config: confluence)
-        PageGenerator.generate(page: page, user: config.user)
+    enum Reserved: String, CaseIterable {
+        case pageTitle, templateName, spaceKey, ancestorsKey
     }
     
     public static func initialize() {
-        print("💡 initializing...")
-
         let configDirName = ".coupage"
         let userConfigContents = """
                                 id:
@@ -83,6 +47,7 @@ public struct CoupageCLI {
             _ = FileManager.default.createFile(atPath: sampleTmplFileName, contents: sampleTmplContents, attributes: nil)
             _ = FileManager.default.createFile(atPath: sampleYmlFileName, contents: sampleYmlContents, attributes: nil)
             print("🍻 completed!!!")
+            
         } catch {
             try? FileManager.default.removeItem(atPath: configDirName)
             try? FileManager.default.removeItem(atPath: userConfigFileName)
@@ -93,4 +58,45 @@ public struct CoupageCLI {
             fatalError("⛔️ failed to create config files")
         }
     }
+    
+    public static func run(_ args: [String]) {
+        let (reservedAuguments, templateAuguments) = parse(args: args)
+        
+        guard let pageTitle = reservedAuguments[.pageTitle], let templateName = reservedAuguments[.templateName] else {
+            fatalError("⛔️ pageTitle/templateNameが存在しません")
+        }
+        
+        let config = ConfigLoader.loadConfig(templateName: templateName)
+        let confluence = Config.Page(url: config.page.url,
+                                     spaceKey: reservedAuguments[.spaceKey] ?? config.page.spaceKey,
+                                     ancestorsKey: reservedAuguments[.ancestorsKey] ?? config.page.ancestorsKey)
+        
+        var template = TemplateLoader.fetchTemplate(templateName: templateName)
+        templateAuguments.forEach { key, value in
+            template = template.replacingOccurrences(of: "{{\(key)}}", with: value)
+        }
+        
+        let page = Page(title: pageTitle, body: template, config: confluence)
+        PageGenerator.generate(page: page, user: config.user)
+    }
 }
+
+private extension CoupageCLI {
+    static func parse(args: [String]) -> ([Reserved: String], [String: String]) {
+        var reservedAuguments: [Reserved: String] = [:]
+        var templateAuguments: [String: String] = [:]
+        
+        args.filter{ $0.contains(":") }
+            .compactMap { $0.split(separator: ":").map(String.init) }
+            .forEach { arg in
+                if let reservedkey = Reserved(rawValue: arg[0]) {
+                    reservedAuguments[reservedkey] = arg[1]
+                } else {
+                    templateAuguments[arg[0]] = arg[1]
+                }
+        }
+        
+        return (reservedAuguments, templateAuguments)
+    }
+}
+
