@@ -56,7 +56,7 @@ $ coupage init
 ### 📚 Usage
 #### Generate page
 ```sh
-$ coupage pageTitle:XXX templateName:XXX
+$ coupage run pageTitle:XXX templateName:XXX
 ```
 - ##### Requied Parameter
   - ##### pageTitle: `page title`
