@@ -76,7 +76,7 @@ public struct CoupageCLI {
             template = template.replacingOccurrences(of: "{{\(key)}}", with: value)
         }
         
-        let page = Page(title: pageTitle, body: template, config: confluence)
+        let page = CoupagePage(title: pageTitle, body: template, config: confluence)
         PageGenerator.generate(page: page, user: config.user)
     }
 }

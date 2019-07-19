@@ -7,6 +7,8 @@
 
 import Foundation
 import Config
+import SwiftyAtlassian
+import SwiftyConfluence
 
 /// ConfluenceのREST APIで、新規ページを出力する
 /// https://developer.atlassian.com/server/confluence/confluence-rest-api-examples/
@@ -14,32 +16,37 @@ public struct PageGenerator {
     
     private init() {}
     
-    public static func generate(page: Page, user: Config.User) {
+    public static func generate(page: CoupagePage, user: Config.User) {
         
-        var headerFields: [String: String] {
-            var headerFieldsDic = [String: String]()
-            headerFieldsDic["Content-Type"] = "application/json"
-            guard let credentialData = "\(user.name):\(user.password)".data(using: String.Encoding.utf8) else {
-                fatalError("⛔️ 認証用データ生成失敗")
-            }
-            let credential = credentialData.base64EncodedString(options: [])
-            headerFieldsDic["Authorization"] = "Basic \(credential)"
-            return headerFieldsDic
-        }
+//        var headerFields: [String: String] {
+//            var headerFieldsDic = [String: String]()
+//            headerFieldsDic["Content-Type"] = "application/json"
+//            guard let credentialData = "\(user.name):\(user.password)".data(using: String.Encoding.utf8) else {
+//                fatalError("⛔️ 認証用データ生成失敗")
+//            }
+//            let credential = credentialData.base64EncodedString(options: [])
+//            headerFieldsDic["Authorization"] = "Basic \(credential)"
+//            return headerFieldsDic
+//        }
         
-        var bodyJson: [String: Any] {
-            var jsonDic = [String: Any]()
-            jsonDic["type"] = "page"
-            jsonDic["title"] = page.title
-            jsonDic["space"] = ["key": page.config.spaceKey]
-            if let ancestorsKey = page.config.ancestorsKey {
-                jsonDic["ancestors"] = [["id": ancestorsKey]]
-            }
-            jsonDic["body"] = ["storage": ["value": page.body, "representation": "storage"]]
-            return jsonDic
-        }
+//        var bodyJson: [String: Any] {
+//            var jsonDic = [String: Any]()
+//            jsonDic["type"] = "page"
+//            jsonDic["title"] = page.title
+//            jsonDic["space"] = ["key": page.config.spaceKey]
+//            if let ancestorsKey = page.config.ancestorsKey {
+//                jsonDic["ancestors"] = [["id": ancestorsKey]]
+//            }
+//            jsonDic["body"] = ["storage": ["value": page.body, "representation": "storage"]]
+//            return jsonDic
+//        }
         
-        request(url: page.config.url, header: headerFields, body: bodyJson)
+        let cPage = Page(title: page.title, body: page.body, url: page.config.url, spaceKey: page.config.spaceKey, ancestorsKey: page.config.ancestorsKey)
+        
+        Atlassian<Server>.Confluence.Content(withAuth: AuthConfig(name: user.name, password: user.password)).create(page: cPage)
+
+        
+//        request(url: page.config.url, header: headerFields, body: bodyJson)
     }
 }
 

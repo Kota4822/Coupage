@@ -8,7 +8,7 @@
 import Foundation
 import Config
 
-public struct Page {
+public struct CoupagePage {
     let title: String
     let body: String
     let config: Config.Page

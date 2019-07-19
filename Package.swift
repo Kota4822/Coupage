@@ -12,6 +12,8 @@ let package = Package(
         // Dependencies declare other packages that this package depends on.
         .package(url: "https://github.com/jpsim/Yams.git", from: "1.0.1"),
         .package(url: "https://github.com/kylef/Commander.git", from: "0.8.0"),
+        .package(url: "https://github.com/bigwaveclub/SwiftyAtlassian.git", .branch("master")),
+        .package(url: "https://github.com/bigwaveclub/SwiftyConfluence.git", .branch("tmp/dependency"))
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -33,7 +35,7 @@ let package = Package(
             dependencies: []),
         .target(
             name: "PageGenerator",
-            dependencies: ["Config", "ConfigLoader", "TemplateLoader"]),
+            dependencies: ["Config", "ConfigLoader", "TemplateLoader", "SwiftyAtlassian", "SwiftyConfluence"]),
         .target(
             name: "Extension",
             dependencies: []),
