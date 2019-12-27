@@ -14,7 +14,7 @@ public struct TemplateLoader {
         let path = templatePath(for: templateName)
         
         if !FileManager.default.fileExists(atPath: path) {
-            fatalError("⛔️ Templateファイルが存在しません")
+            fatalError("⛔️ Templateファイルが存在しません path > \(path)")
         }
         
         guard let file = FileManager.default.contents(atPath: path), let contents = String(data: file, encoding: .utf8) else {
