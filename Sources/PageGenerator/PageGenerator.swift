@@ -10,6 +10,8 @@ import Config
 
 /// ConfluenceのREST APIで、新規ページを出力する
 /// https://developer.atlassian.com/server/confluence/confluence-rest-api-examples/
+/// クラウド移行してる場合こちら
+/// https://developer.atlassian.com/cloud/confluence/rest/api-group-content/#api-api-content-post
 public struct PageGenerator {
     
     private init() {}
@@ -35,7 +37,7 @@ public struct PageGenerator {
             if let ancestorsKey = page.config.ancestorsKey {
                 jsonDic["ancestors"] = [["id": ancestorsKey]]
             }
-            jsonDic["body"] = ["storage": ["value": page.body, "representation": "storage"]]
+            jsonDic["body"] = ["atlas_doc_format": ["value": page.body, "representation": "atlas_doc_format"]]
             return jsonDic
         }
         
@@ -60,6 +62,7 @@ private extension PageGenerator {
         request.httpMethod = "POST"
         request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: [])
         
+
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             
             guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {
