@@ -33,12 +33,12 @@ $ coupage init
 │   └── templateA
 │         ├── page_config.yml
 │         └── template.tpl
-└── user_config.yml
+└── user_config.yml(Optional)
 ```
 
 - user_config.yml
   - id: `confluence user id`
-  - password: `confluence user password`
+  - apiKey: `confluence user APIKey`
 - .coupage/templates/`templateName`
   - Template name to use. As many as you like.
 - `templateName`/page_config.yml
@@ -62,6 +62,8 @@ $ coupage run pageTitle:XXX templateName:XXX
   - ##### pageTitle: `page title`
   - ##### templateName: `template name to use`
 - ##### Optional Parrameter
+  - userId: `Confluence User Id`
+  - apiKey: `Confluence User ApiKey`
   - spaceKey: `spaceKey to output(optional：If not in the parameter, use page_config.yml.)`
   - ancestorsKey: `ancestorsKey to output(optional：If not in the parameter, use page_config.yml.)`
   - template ReplaceKey and Values

@@ -5,23 +5,21 @@
 //  Created by Kota4822 on 2019/02/23.
 //
 
-import Foundation
 import Config
+import Foundation
 
 /// ConfluenceのREST APIで、新規ページを出力する
 /// https://developer.atlassian.com/server/confluence/confluence-rest-api-examples/
 /// クラウド移行してる場合こちら
 /// https://developer.atlassian.com/cloud/confluence/rest/api-group-content/#api-api-content-post
 public struct PageGenerator {
-    
     private init() {}
     
     public static func generate(page: Page, user: Config.User) {
-        
         var headerFields: [String: String] {
             var headerFieldsDic = [String: String]()
             headerFieldsDic["Content-Type"] = "application/json"
-            guard let credentialData = "\(user.name):\(user.password)".data(using: String.Encoding.utf8) else {
+            guard let credentialData = "\(user.id):\(user.apiKey)".data(using: String.Encoding.utf8) else {
                 fatalError("⛔️ 認証用データ生成失敗")
             }
             let credential = credentialData.base64EncodedString(options: [])
@@ -45,8 +43,17 @@ public struct PageGenerator {
     }
 }
 
-private extension PageGenerator {
+// TODO: idを返却したい
+struct ResponseData: Codable {
+    let id: String
     
+    struct Space {
+        let id: String
+        let key: String
+    }
+}
+
+private extension PageGenerator {
     /// 有効StatusCode
     static var validStatusCodeRange: ClosedRange<Int> {
         return 200...203
@@ -54,7 +61,6 @@ private extension PageGenerator {
     
     /// Confluence REST API を利用してページ追加リクエストを行う
     static func request(url: URL, header: [String: String]?, body: [String: Any]) {
-
         let semaphore = DispatchSemaphore(value: 0)
         var request = URLRequest(url: url)
         
@@ -62,7 +68,6 @@ private extension PageGenerator {
         request.httpMethod = "POST"
         request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: [])
         
-
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             
             guard let statusCode = (response as? HTTPURLResponse)?.statusCode else {

@@ -1,7 +1,7 @@
 config:
   user:
-    user_id: "user_id"
-    password: "password"
+    id: "user_id"
+    apiKey: "apiKey"
   confluence:
     url: "url"
     default_space_key: "space_key"

@@ -10,10 +10,16 @@ import Yams
 
 import Config
 
+enum ConfigFileState {
+    case valid(Node)
+    case notExist
+    case invalid
+    case couldNotLoad
+}
+
 public struct ConfigLoader {
-    
     private init() {}
-    
+
     /// configファイルをYAML形式でパースします
     ///
     /// - Returns: configから読み込んだUser設定
@@ -25,7 +31,6 @@ public struct ConfigLoader {
 }
 
 private extension ConfigLoader {
-    
     static var rootPath: String {
         return FileManager.default.currentDirectoryPath + "/.coupage"
     }
@@ -33,56 +38,65 @@ private extension ConfigLoader {
     static var userConfigFileName: String {
         return "user_config.yml"
     }
-    
+
     static var pageConfigFileName: String {
         return "page_config.yml"
     }
 
-    static func fetchUserConfig() -> Config.User {
-
+    static func fetchUserConfig() -> Config.User? {
         let path = [rootPath, userConfigFileName].joined(separator: "/")
-        let node = fetchConfigFile(at: path)
+        let result = fetchConfigFile(at: path)
+        guard case .valid(let node) = result else {
+            return nil
+        }
 
         /// parse user config
-        guard let name = node["id"]?.string,
-              !name.isEmpty,
-              let password = node["password"]?.string,
-              !password.isEmpty else {
-                fatalError("⛔️ couldn't load user config")
+        guard let userId = node["id"]?.string, !userId.isEmpty,
+            let apiKey = node["apiKey"]?.string, !apiKey.isEmpty else {
+            return nil
         }
-        
-        return Config.User(name: name, password: password)
+
+        return Config.User(id: userId, apiKey: apiKey)
     }
 
     static func fetchPageConfig(templateName: String) -> Config.Page {
-        
         let path = [rootPath, "templates", templateName, pageConfigFileName].joined(separator: "/")
-        let node = fetchConfigFile(at: path)
-        
-        /// parse confluence config
-        guard let urlString = node["url"]?.string,
-            let url = URL(string: urlString),
-            let defaultSpaceKey = node["default_space_key"]?.string,
-            let defaultAncestorsKey = node["default_ancestors_key"]?.string else {
+        let result = fetchConfigFile(at: path)
+
+        switch result {
+        case .invalid:
+            fatalError("⛔️ PageConfigが有効ではありません")
+        case .couldNotLoad:
+            fatalError("⛔️ PageConfigが読み込めません")
+        case .notExist:
+            fatalError("⛔️ PageConfigがありません")
+
+        case .valid(let node):
+            /// parse confluence config
+            guard let urlString = node["url"]?.string,
+                let url = URL(string: urlString),
+                let defaultSpaceKey = node["default_space_key"]?.string,
+                let defaultAncestorsKey = node["default_ancestors_key"]?.string else {
                 fatalError("⛔️ couldn't load page config")
+            }
+
+            return Config.Page(url: url, spaceKey: defaultSpaceKey, ancestorsKey: defaultAncestorsKey)
         }
-        
-        return Config.Page(url: url, spaceKey: defaultSpaceKey, ancestorsKey: defaultAncestorsKey)
     }
-    
-    static func fetchConfigFile(at filePath: String) -> Node {
+
+    static func fetchConfigFile(at filePath: String) -> ConfigFileState {
         if !FileManager.default.fileExists(atPath: filePath) {
-            fatalError("⛔️ config is not exist")
-        }
-        
-        guard let configFile = FileManager.default.contents(atPath: filePath), let contents = String(data: configFile, encoding: .utf8) else {
-            fatalError("⛔️ config is invalid")
-        }
-        
-        guard let node = try? Yams.compose(yaml: contents), let result = node else {
-            fatalError("⛔️ couldn't load config")
+            return .notExist
         }
 
-        return result
+        guard let configFile = FileManager.default.contents(atPath: filePath), let contents = String(data: configFile, encoding: .utf8) else {
+            return .invalid
+        }
+
+        guard let node = try? Yams.compose(yaml: contents), let result = node else {
+            return .couldNotLoad
+        }
+
+        return .valid(result)
     }
 }

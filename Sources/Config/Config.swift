@@ -9,12 +9,12 @@ import Foundation
 
 public struct Config {
     public struct User {
-        public let name: String
-        public let password: String
+        public let id: String
+        public let apiKey: String
         
-        public init(name: String, password: String) {
-            self.name = name
-            self.password = password
+        public init(id: String, apiKey: String) {
+            self.id = id
+            self.apiKey = apiKey
         }
     }
     
@@ -30,10 +30,10 @@ public struct Config {
         }
     }
     
-    public let user: User
+    public let user: User?
     public let page: Page
     
-    public init(user: User, page: Page) {
+    public init(user: User?, page: Page) {
         self.user = user
         self.page = page
     }

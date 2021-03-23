@@ -13,14 +13,14 @@ import PageGenerator
 
 public struct CoupageCLI {
     enum Reserved: String, CaseIterable {
-        case pageTitle, templateName, spaceKey, ancestorsKey
+        case pageTitle, templateName, spaceKey, ancestorsKey, userId, apiKey
     }
     
     public static func initialize() {
         let configDirName = ".coupage"
         let userConfigContents = """
                                 id:
-                                password:
+                                apiKey:
                                 """.data(using: .utf8)
         
         let userConfigFileName = "\(configDirName)/user_config.yml"
@@ -67,6 +67,7 @@ public struct CoupageCLI {
         }
         
         let config = ConfigLoader.loadConfig(templateName: templateName)
+        
         let confluence = Config.Page(url: config.page.url,
                                      spaceKey: reservedAuguments[.spaceKey] ?? config.page.spaceKey,
                                      ancestorsKey: reservedAuguments[.ancestorsKey] ?? config.page.ancestorsKey)
@@ -77,7 +78,17 @@ public struct CoupageCLI {
         }
         
         let page = Page(title: pageTitle, body: template, config: confluence)
-        PageGenerator.generate(page: page, user: config.user)
+        
+        var user: Config.User?
+        if let userId = reservedAuguments[.userId], let apiKey = reservedAuguments[.apiKey] {
+            user = Config.User(id: userId, apiKey: apiKey)
+        }
+        
+        guard let fixedUser = user ?? config.user else {
+            fatalError("⛔️ user情報が取得できません")
+        }
+        
+        PageGenerator.generate(page: page, user: fixedUser)
     }
 }
 
