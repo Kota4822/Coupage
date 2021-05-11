@@ -78,17 +78,26 @@ public struct CoupageCLI {
         }
         
         let page = Page(title: pageTitle, body: template, config: confluence)
+        let user = getUserCredential(arg: reservedAuguments, config: config)
         
-        var user: Config.User?
-        if let userId = reservedAuguments[.userId], let apiKey = reservedAuguments[.apiKey] {
-            user = Config.User(id: userId, apiKey: apiKey)
+        PageGenerator.generate(page: page, user: user)
+    }
+    
+    public static func find(_ args: [String]) -> String? {
+        let (reservedAuguments, _) = parse(args: args)
+        guard let pageTitle = reservedAuguments[.pageTitle], let templateName = reservedAuguments[.templateName] else {
+            fatalError("⛔️ pageTitle/templateNameが存在しません")
         }
         
-        guard let fixedUser = user ?? config.user else {
-            fatalError("⛔️ user情報が取得できません")
-        }
+        let config = ConfigLoader.loadConfig(templateName: templateName)
         
-        PageGenerator.generate(page: page, user: fixedUser)
+        let confluence = Config.Page(url: config.page.url,
+                                     spaceKey: reservedAuguments[.spaceKey] ?? config.page.spaceKey,
+                                     ancestorsKey: reservedAuguments[.ancestorsKey] ?? config.page.ancestorsKey)
+        
+        let user = getUserCredential(arg: reservedAuguments, config: config)
+        
+        return PageSearcher.search(config: confluence, title: pageTitle, user: user)
     }
 }
 
@@ -108,6 +117,18 @@ private extension CoupageCLI {
         }
         
         return (reservedAuguments, templateAuguments)
+    }
+    
+    static func getUserCredential(arg: [Reserved: String], config: Config) -> Config.User {
+        var user: Config.User?
+        if let userId = arg[.userId], let apiKey = arg[.apiKey] {
+            user = Config.User(id: userId, apiKey: apiKey)
+        }
+        
+        guard let fixedUser = user ?? config.user else {
+            fatalError("⛔️ user情報が取得できません")
+        }
+        return fixedUser
     }
 }
 
