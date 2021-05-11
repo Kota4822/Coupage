@@ -8,8 +8,8 @@
 import Config
 import Foundation
 
-/// ConfluenceのREST APIで、新規ページを出力する
-/// https://developer.atlassian.com/cloud/confluence/rest/api-group-content/#api-api-content-post
+/// ConfluenceのREST APIで、ページ情報を取得する
+/// https://developer.atlassian.com/cloud/confluence/rest/api-group-content/#api-api-content-get
 public struct PageSearcher {
     private init() {}
     
