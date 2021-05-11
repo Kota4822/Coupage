@@ -23,4 +23,10 @@ Group {
         CoupageCLI.run(args)
         print("🍻 Completion!!!")
     }
+    
+    $0.command("find", description: "Find page ID with page title. If the page is not found, create empty page.") { (args: [String]) in
+        if let id = CoupageCLI.find(args) {
+            print("\(id)")
+        }
+    }
 }.run()
