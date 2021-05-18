@@ -1,6 +1,6 @@
 EXECUTABLE_NAME = coupage
 REPO = https://github.com/Kota4822/Coupage
-VERSION = 0.92.0
+VERSION = 0.93.0
 
 PREFIX = /usr/local
 INSTALL_PATH = $(PREFIX)/bin/$(EXECUTABLE_NAME)
